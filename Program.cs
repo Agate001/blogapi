@@ -13,7 +13,7 @@ builder.Services.AddScoped<BlogItemService>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
 var connectionString = builder.Configuration.GetConnectionString("myBlogString2");
-builder.Services.AddDbContext<Context>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(connectionString));
 
 
 

@@ -5,7 +5,7 @@
 namespace blogapi.Migrations
 {
     /// <inheritdoc />
-    public partial class Innit : Migration
+    public partial class Innitial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
