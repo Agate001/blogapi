@@ -18,7 +18,7 @@ namespace blogapi.Controllers
             _data = dataFromService;
         }
     
-
+    [HttpPost("AddUser")]
     public bool AddUser(CreateAccountDTO UserToAdd)
     {
         return _data.AddUser(UserToAdd);
