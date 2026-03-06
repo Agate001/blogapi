@@ -44,6 +44,17 @@ namespace blogapi.Controllers;
     {
         return _data.Login(User);
     }
+    [HttpPost("DeleteUser/{userToDelete}")]
+    public bool DeleteUser(string userToDelete)
+    {
+        return _data.DeleteUser(userToDelete);
+    }
+
+    [HttpPost("UpdateUser/{id}/{username}")]
+    public bool UpdateUser(int id, string username)
+    {
+        return _data.UpdateUser(id, username);
+    }
     } 
         
 

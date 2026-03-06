@@ -111,11 +111,20 @@ namespace blogapi.Services;
         return _context.UserInfo;
     }
 
+    public UserModel GetAlluserDataByUsername(string username)
+    {
+        return _context .UserInfo.FirstOrDefault(user => user.Username == username);
+    }
+
     public IActionResult Login(LoginDTO user)
     {
             IActionResult result = Unauthorized();
         if (DoesUserExist(user.Username))
         {
+             UserModel founduser = GetAlluserDataByUsername(user.Username);
+            if (verifyUserPassword(user.Password, founduser.Hash, founduser.Salt))
+            {
+                
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("evenmoresuperdupersecurekey@3456789"));
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
@@ -129,6 +138,7 @@ namespace blogapi.Services;
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
             result = Ok(new{Token = tokenString});
+            }
         }
         return result;
     }
@@ -136,5 +146,42 @@ namespace blogapi.Services;
     internal UserIdDTO GetUserIdDTOByUserName(string username)
     {
         throw new NotImplementedException();
+    }
+
+    //helper function
+    public UserModel GetUserByUsername(string username)
+    {
+        return _context.UserInfo.SingleOrDefault(user => user.Username == username);
+    }
+    public bool DeleteUser(string userToDelete)
+    {
+        UserModel foundUser = GetUserByUsername(userToDelete);
+        bool result = false;
+
+        if(foundUser != null)
+        {
+            foundUser.Username = userToDelete;
+            _context.Remove(foundUser);
+
+            result = _context.SaveChanges() != 0;
+        }
+        return result;
+    }
+    public UserModel GetuserById(int id)
+    {
+        return _context.UserInfo.SingleOrDefault(user => user.Id == id);
+    }
+
+    internal bool UpdateUser(int id, string username)
+    {
+        UserModel foundUser = GetuserById(id);
+        bool result = false;
+        if(foundUser != null)
+        {
+            foundUser.Username = username;
+            _context.Update(foundUser);
+            result = _context.SaveChanges() != 0;
+        }
+        return result;
     }
 }
