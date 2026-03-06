@@ -1,16 +1,22 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using blogapi.Models;
 using blogapi.Models.DTO;
 using blogapi.Services.Context;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace blogapi.Services;
 
-    public class UserService
+    public class UserService : ControllerBase
     {
 
         private readonly DataContext _context;
@@ -99,4 +105,36 @@ namespace blogapi.Services;
         return newHash == StoredHash;
 
     }
+
+    public IEnumerable<UserModel> GetAllUsers()
+    {
+        return _context.UserInfo;
     }
+
+    public IActionResult Login(LoginDTO user)
+    {
+            IActionResult result = Unauthorized();
+        if (DoesUserExist(user.Username))
+        {
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("evenmoresuperdupersecurekey@3456789"));
+            var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+
+            var tokeOptions = new JwtSecurityToken(
+                issuer: "http://localhost:5059/",
+                audience: "http://localhost:5059/",
+                claims: new List<Claim>(),
+                expires: DateTime.Now.AddMinutes(5),
+                signingCredentials: signinCredentials
+            );
+
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
+            result = Ok(new{Token = tokenString});
+        }
+        return result;
+    }
+
+    internal UserIdDTO GetUserIdDTOByUserName(string username)
+    {
+        throw new NotImplementedException();
+    }
+}
